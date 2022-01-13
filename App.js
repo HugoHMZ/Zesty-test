@@ -1,5 +1,4 @@
-import React from 'react';
-import { Node } from 'react';
+import React, { Component } from 'react';
 import {
   Button,
   SafeAreaView,
@@ -11,80 +10,115 @@ import {
   View,
   TextInput,
   Alert,
-  Image,
-  FlatList
-} from 'react-native';
+  Image} from 'react-native';
 
 import {
   Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+class App extends Component {
 
-  const [text, setText] = React.useState('');
-  const [names, setNames] = React.useState([]);
-  //const [posts, setPosts] = React.useState([]);
+  constructor(props) {
+    super(props)
+    this.state = {
+      text: '',
+      names: [],
+      posts: [],
+      theme: '',
+      k: 0,
+    }
+  }
 
+  componentDidMount() {
+    async () => {
+      const theme = useColorScheme() === "dark" ? styles.dark : styles.light;
+      this.setState({ theme });
+    };
+  }
 
-  const Publish = () => {
-    if (text != '') {
-      names.push(text)
-      Alert.alert('Publication réussi !')
+  changeTitle = (e) => {
+    this.setState({ text: e });
+  }
+
+  Publish = () => {
+    if (this.state.text != '') {
+      this.setState(prevState => ({
+        names: [...prevState.names, this.state.text]
+      }))
+      this.createPostsLists();
     }
     else
       Alert.alert('Vous devez rentrer une phrase')
-
   }
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
+  getCoffeeImg = () => {
+    return fetch('https://coffee.alexflipnote.dev/random.json')
+      .then((response) => response.json())
+      .then((json) => {
+        return json.file;
+      })
+      .catch((error) => {
+        console.log('Error while fetching coffee img, using default img\n' + error);
+        return 'error'
+      });
+  };
 
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setText}
-            placeholder="Quoi de neuf?"
+  createPostsLists = () => {
+    var img = 'https://coffee.alexflipnote.dev/Bg47hfAWxjA_coffee.jpg'
+    this.getCoffeeImg().then(response => {
+      //check if the api request succeeded
+      //otherwise, use the default img
+      if (response == 'error')
+        response = img
+      var elem =
+        <View key={this.state.k} style={styles.post}>
+          <Text>{this.state.text}</Text>
+          <Image
+            style={{ width: 305, height: 215 }}
+            source={{ uri: response }}
           />
-          <View style={styles.publish}>
-            <Button
-              title="Publier"
-              style={styles.publish}
-
-              onPress={() => Publish()}
-            />
-          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+      //add the new Post to the Posts list
+      this.setState(prevState => ({
+        posts: [...prevState.posts, elem],
+        k: this.state.k + 1,
+      }))
+    })
+  }
 
-{/* <Section title="Step One">
-            Edit App.js to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section> */}
+
+  render() {
+    return (
+      <SafeAreaView style={this.backgroundStyle}>
+        <StatusBar barStyle={this.isDarkMode ? 'light-content' : 'dark-content'} />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={this.backgroundStyle}>
+
+          <View
+            style={{
+              backgroundColor: this.isDarkMode ? Colors.black : Colors.white,
+            }}>
+            <TextInput
+              style={styles.input}
+              onChangeText={(e) => this.changeTitle(e)}
+              placeholder="Quoi de neuf?"
+            />
+            <View style={styles.publish}>
+              <Button
+                title="Publier"
+                style={styles.publish}
+                onPress={() => this.Publish()}
+              />
+            </View>
+            {this.state.posts}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+};
 
 const styles = StyleSheet.create({
   sectionContainer: {
@@ -101,7 +135,10 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   publish: {
-    paddingLeft: 100,
+    marginLeft: 100,
+  },
+  post: {
+    marginBottom: 30,
   },
   input: {
     paddingTop: 20,
