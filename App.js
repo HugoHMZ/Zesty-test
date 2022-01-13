@@ -10,7 +10,9 @@ import {
   View,
   TextInput,
   Alert,
-  Image} from 'react-native';
+  Image,
+  Pressable
+} from 'react-native';
 
 import {
   Colors,
@@ -103,14 +105,12 @@ class App extends Component {
             <TextInput
               style={styles.input}
               onChangeText={(e) => this.changeTitle(e)}
-              placeholder="Quoi de neuf?"
+              placeholder="Quoi de neuf ?"
             />
             <View style={styles.publish}>
-              <Button
-                title="Publier"
-                style={styles.publish}
-                onPress={() => this.Publish()}
-              />
+              <Pressable  onPress={() => this.Publish()} hitSlop={{left: 20, right: 20}}>
+                <Text style={styles.publishText}>{"Publier"}</Text>
+              </Pressable>
             </View>
             {this.state.posts}
           </View>
@@ -135,7 +135,15 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   publish: {
-    marginLeft: 100,
+    width: 110,
+    marginLeft: 240,
+    marginTop: 10,
+    marginRight: 40,
+    backgroundColor: '#ffed4e',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 30,
   },
   post: {
     marginBottom: 30,
@@ -143,9 +151,21 @@ const styles = StyleSheet.create({
   input: {
     paddingTop: 20,
     paddingBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+    width: 300,
     marginLeft: 'auto',
     marginRight: 'auto',
     fontSize: 20,
+    borderRadius: 10,
+    backgroundColor: '#fafafa',
+  },
+  publishText: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
   },
   highlight: {
     fontWeight: '700',
