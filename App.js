@@ -11,42 +11,49 @@ import {
   TextInput,
   Alert,
   Image,
-  Pressable
+  Pressable,
+  Appearance
 } from 'react-native';
 
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-
 class App extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      text: '',
+      input: '',
       names: [],
       posts: [],
-      theme: '',
       k: 0,
+      currentTheme: Appearance.getColorScheme(),
     }
   }
 
   componentDidMount() {
-    async () => {
-      const theme = useColorScheme() === "dark" ? styles.dark : styles.light;
-      this.setState({ theme });
-    };
-  }
+    Appearance.addChangeListener(this.onAppThemeChanged);
+  };
+
+  componentWillUnmount() {
+    Appearance.addChangeListener(this.onAppThemeChanged);
+  };
+
+  onAppThemeChanged = (theme) => {
+    const currentTheme = theme;
+    this.setState({ currentTheme: currentTheme });
+  };
 
   changeTitle = (e) => {
-    this.setState({ text: e });
+    this.setState({ input: e });
   }
 
   Publish = () => {
-    if (this.state.text != '') {
+    //check if we are creating a post with a non empty title
+    if (this.state.input != '') {
       this.setState(prevState => ({
-        names: [...prevState.names, this.state.text]
+        names: [...prevState.names, this.state.input]
       }))
       this.createPostsLists();
     }
@@ -68,6 +75,7 @@ class App extends Component {
 
   createPostsLists = () => {
     var img = 'https://coffee.alexflipnote.dev/Bg47hfAWxjA_coffee.jpg'
+
     this.getCoffeeImg().then(response => {
       //check if the api request succeeded
       //otherwise, use the default img
@@ -75,7 +83,7 @@ class App extends Component {
         response = img
       var elem =
         <View key={this.state.k} style={styles.post}>
-          <Text>{this.state.text}</Text>
+          <Text style={styles.title}>{this.state.input}</Text>
           <Image
             style={{ width: 305, height: 215 }}
             source={{ uri: response }}
@@ -83,32 +91,31 @@ class App extends Component {
         </View>
       //add the new Post to the Posts list
       this.setState(prevState => ({
-        posts: [...prevState.posts, elem],
+        posts: [elem, ...prevState.posts],
         k: this.state.k + 1,
       }))
     })
   }
 
-
   render() {
     return (
-      <SafeAreaView style={this.backgroundStyle}>
-        <StatusBar barStyle={this.isDarkMode ? 'light-content' : 'dark-content'} />
+      <SafeAreaView style={{ backgroundColor: this.state.currentTheme === "dark" ? '#dcdcdc' : Colors.white, height: '100%' }}>
+        <StatusBar barStyle={this.state.currentTheme === "dark" ? 'light-content' : 'dark-content'} />
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
-          style={this.backgroundStyle}>
-
+          style={{ backgroundColor: this.state.currentTheme === "dark" ? '#dcdcdc' : Colors.white }}>
           <View
             style={{
-              backgroundColor: this.isDarkMode ? Colors.black : Colors.white,
+              backgroundColor: this.state.currentTheme === "dark" ? '#dcdcdc' : Colors.white,
             }}>
             <TextInput
               style={styles.input}
               onChangeText={(e) => this.changeTitle(e)}
               placeholder="Quoi de neuf ?"
+              placeholderTextColor={this.state.currentTheme === "dark" ? '#696969' : '#dcdcdc'}
             />
             <View style={styles.publish}>
-              <Pressable  onPress={() => this.Publish()} hitSlop={{left: 20, right: 20}}>
+              <Pressable onPress={() => this.Publish()} hitSlop={{ left: 20, right: 20 }}>
                 <Text style={styles.publishText}>{"Publier"}</Text>
               </Pressable>
             </View>
@@ -147,6 +154,8 @@ const styles = StyleSheet.create({
   },
   post: {
     marginBottom: 30,
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   input: {
     paddingTop: 20,
@@ -160,12 +169,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fafafa',
   },
-  publishText: {
+  publishText: {
     alignItems: 'center',
     justifyContent: 'center',
     color: 'white',
     fontSize: 18,
     fontWeight: '700',
+  },
+  title: {
+    marginTop: 10,
+    marginBottom: 10,
   },
   highlight: {
     fontWeight: '700',
