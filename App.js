@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import {
-  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
-  useColorScheme,
   View,
   TextInput,
   Alert,
@@ -14,10 +11,7 @@ import {
   Pressable,
   Appearance
 } from 'react-native';
-
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+import { styles } from './Styles.js'
 
 class App extends Component {
 
@@ -47,6 +41,13 @@ class App extends Component {
 
   changeTitle = (e) => {
     this.setState({ input: e });
+  }
+
+  isDarkMode = () => {
+    if (this.state.currentTheme === "dark")
+      return true
+    else
+      return false
   }
 
   Publish = () => {
@@ -99,20 +100,24 @@ class App extends Component {
 
   render() {
     return (
-      <SafeAreaView style={{ backgroundColor: this.state.currentTheme === "dark" ? '#dcdcdc' : Colors.white, height: '100%' }}>
-        <StatusBar barStyle={this.state.currentTheme === "dark" ? 'light-content' : 'dark-content'} />
+      <SafeAreaView style={[
+        this.isDarkMode() ? styles.darkBg : styles.lightBg, { height: '100%' }]
+      }>
+        <StatusBar barStyle={this.isDarkMode() ? 'light-content' : 'dark-content'} />
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
-          style={{ backgroundColor: this.state.currentTheme === "dark" ? '#dcdcdc' : Colors.white }}>
+          style={
+            this.isDarkMode() ? styles.darkBg : styles.lightBg
+          }>
           <View
-            style={{
-              backgroundColor: this.state.currentTheme === "dark" ? '#dcdcdc' : Colors.white,
-            }}>
+            style={
+              this.isDarkMode() ? styles.darkBg : styles.lightBg
+            }>
             <TextInput
               style={styles.input}
               onChangeText={(e) => this.changeTitle(e)}
               placeholder="Quoi de neuf ?"
-              placeholderTextColor={this.state.currentTheme === "dark" ? '#696969' : '#dcdcdc'}
+              placeholderTextColor={this.isDarkMode() ? '#696969' : '#dcdcdc'}
             />
             <View style={styles.publish}>
               <Pressable onPress={() => this.Publish()} hitSlop={{ left: 20, right: 20 }}>
@@ -126,63 +131,5 @@ class App extends Component {
     );
   }
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  publish: {
-    width: 110,
-    marginLeft: 240,
-    marginTop: 10,
-    marginRight: 40,
-    backgroundColor: '#ffed4e',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 30,
-  },
-  post: {
-    marginBottom: 30,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  input: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
-    width: 300,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    fontSize: 20,
-    borderRadius: 10,
-    backgroundColor: '#fafafa',
-  },
-  publishText: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  title: {
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
