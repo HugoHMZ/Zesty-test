@@ -5,4 +5,4 @@ All the important informations required to complete this project are listed foll
 https://github.com/zesty-app/simple-rn-app/blob/main/README.md
 
 To start the app run:
-react-native run-ios
+> react-native run-ios
